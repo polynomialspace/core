@@ -52,25 +52,23 @@ func ParMap[T any, U any](
 	slc []T,
 	fn func(context.Context, uint, T) (U, error),
 ) ([]U, error) {
+
 	g, ctx := errgroup.WithContext(ctx)
-	mut := new(sync.Mutex)
-	retS := make([]U, len(slc))
-	for idx, val := range slc {
-		i := uint(idx)
-		v := val
+	ret := make([]U, len(slc))
+	for idx, v := range slc {
+		i, v := uint(idx), v
 		g.Go(func() error {
-			ret, err := fn(ctx, i, v)
-			if err != nil {
-				return err
+			r, err := fn(ctx, i, v)
+			if err == nil {
+				ret[i] = r
 			}
-			mut.Lock()
-			defer mut.Unlock()
-			retS[i] = ret
-			return nil
+			return err
 		})
 	}
+	
 	if err := g.Wait(); err != nil {
 		return nil, err
 	}
-	return retS, nil
+	
+	return ret, nil
 }
