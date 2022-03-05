@@ -16,8 +16,8 @@ import (
 // Example usage of this function:
 //
 //	slc := []int{1, 2, 3, 4, 5}
-//	Iter(len(slc), func(i uint) error {
-//		slc[i] += 1
+//	Map(slc, func(_ uint, val int) (int, error) {
+//		return val+1, nil
 //	})
 func Map[T any, U any](slc []T, fn func(i uint, t T) (U, error)) ([]U, error) {
 	ret := make([]U, len(slc))
@@ -44,7 +44,7 @@ func Map[T any, U any](slc []T, fn func(i uint, t T) (U, error)) ([]U, error) {
 //
 //	var mut sync.Mutex
 //	slc := []int{1, 2, 3, 4, 5}
-//	IterPar(context.Background(), slc, func(_ context.Context, _ uint, val int) (string, error) {
+//	ParMap(context.Background(), slc, func(_ context.Context, _ uint, val int) (string, error) {
 //		return strconv.Itoa(val), nil
 //	})
 func ParMap[T any, U any](
